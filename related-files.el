@@ -36,7 +36,7 @@
 
 ;;; Code:
 
-(defun sstoltze/line-end-respecting-backslash ()
+(defun related-files-line-end-respecting-backslash ()
   "Return the line-end-positon of nearest non-backslash terminated line."
   (let ((le 1))
     (while (and
@@ -51,10 +51,11 @@
     le))
 
 ;;;###autoload
-(defun sstoltze/related-files ()
-  "Return a list of (name . path) annotations for the current buffer."
+(defun related-files-list (&optional buffer-name)
+  "Return an alist of (name . path) annotations for BUFFER-NAME, or current buffer."
   (interactive)
-  (let* ((base-buffer (or (buffer-base-buffer)
+  (let* ((base-buffer (or buffer-name
+                          (buffer-base-buffer)
                           (buffer-name)))
          (root-dir (cond ((and (fboundp 'project-current)
                                (fboundp 'project-root))
@@ -67,7 +68,7 @@
           (widen)
           (goto-char (point-min))
           (while (not (eobp))
-            (let* ((le (sstoltze/line-end-respecting-backslash))
+            (let* ((le (related-files-line-end-respecting-backslash))
                    (line (buffer-substring-no-properties (line-beginning-position)
                                                          (line-end-position le)))
                    (start-char 0))
@@ -88,13 +89,14 @@
                                               related-files)
                           start-char (match-end 0)))))
               (forward-line le))))))
-    related-files))
+    (reverse related-files)))
 
 ;;;###autoload
-(defun sstoltze/find-related-file ()
-  "Let's try this thing out."
+(defun related-files-find-related-file (&optional buffer-name)
+  "Prompt to visit related files defined in BUFFER-NAME.
+Defaults to current buffer."
   (interactive)
-  (let* ((related-files (sstoltze/related-files))
+  (let* ((related-files (related-files-list buffer-name))
          (chosen-file (completing-read "Related files: " related-files nil nil)))
     (when chosen-file
       (let ((file-name (cdr (assoc chosen-file related-files))))
