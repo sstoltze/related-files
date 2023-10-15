@@ -1,10 +1,10 @@
-;;; related-files.el --- work with @related file annotations  -*- lexical-binding:t -*-
+;;; related-files.el --- Work with @related file annotations  -*- lexical-binding:t -*-
 
 ;; Author: Sarah Stoltze <sstoltze@gmail.com>
 ;; Version: 1.0
 ;; Keywords: convenience, files, hypermedia
 ;; URL: https://github.com/sstoltze/related-files
-
+;; Package-Requires: ((emacs "24.4"))
 
 
 ;;; Commentary:
@@ -36,7 +36,7 @@
 
 ;;; Code:
 
-(defun related-files-line-end-respecting-backslash ()
+(defun related-files--line-end-respecting-backslash ()
   "Return the line-end-positon of nearest non-backslash terminated line."
   (let ((le 1))
     (while (and
@@ -68,7 +68,7 @@
           (widen)
           (goto-char (point-min))
           (while (not (eobp))
-            (let* ((le (related-files-line-end-respecting-backslash))
+            (let* ((le (related-files--line-end-respecting-backslash))
                    (line (buffer-substring-no-properties (line-beginning-position)
                                                          (line-end-position le)))
                    (start-char 0))
