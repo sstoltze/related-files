@@ -99,7 +99,7 @@ Defaults to current buffer."
   (let* ((related-files (related-files-list buffer-name))
          (chosen-file (completing-read "Related files: " related-files nil nil)))
     (when chosen-file
-      (let ((file-name (cdr (assoc chosen-file related-files))))
+      (let ((file-name (cdr (assoc-string chosen-file related-files))))
         (find-file file-name)))))
 
 

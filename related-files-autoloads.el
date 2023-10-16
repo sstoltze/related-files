@@ -11,11 +11,17 @@
 
 ;;; Generated autoloads from related-files.el
 
-(autoload 'sstoltze/related-files "related-files" "\
-Return a list of (name . path) annotations for the current buffer." t)
-(autoload 'sstoltze/find-related-file "related-files" "\
-Let's try this thing out." t)
-(register-definition-prefixes "related-files" '("sstoltze/line-end-respecting-backslash"))
+(autoload 'related-files-list "related-files" "\
+Return an alist of (name . path) annotations for BUFFER-NAME, or current buffer.
+
+(fn &optional BUFFER-NAME)" t)
+(autoload 'related-files-find-related-file "related-files" "\
+Prompt to visit related files defined in BUFFER-NAME.
+Defaults to current buffer.
+
+(fn &optional BUFFER-NAME)" t)
+(register-definition-prefixes "related-files" '("related-files--line-end-respecting-backslash"))
+
 
 ;;; End of scraped data
 
