@@ -80,8 +80,9 @@
   (let* ((base-buffer (or buffer-name
                           (buffer-base-buffer)
                           (buffer-name)))
-         (root-dir (or (project-root (project-current))
-                       (and (fboundp 'vc-root-dir) (vc-root-dir))))
+         (root-dir (expand-file-name
+                    (or (project-root (project-current))
+                        (and (fboundp 'vc-root-dir) (vc-root-dir)))))
          (base-buffer-qualified-link (expand-file-name base-buffer))
          (base-buffer-project-link (string-remove-prefix root-dir
                                                          base-buffer-qualified-link))
@@ -107,14 +108,15 @@
                 (while (string-match "\\[\\(.*?\\)\\](\\(.*?\\))" line start-char)
                   (let* ((name      (match-string 1 line))
                          (project-link (match-string 2 line))
-                         (qualified-link (cond ((string= (substring project-link 0 1)
-                                                         ".")
-                                                (concat (expand-file-name project-link)))
-                                               ((string= (substring project-link 0 1)
-                                                         "/")
-                                                (concat root-dir (substring project-link 1)))
-                                               (t
-                                                (concat root-dir project-link)))))
+                         (qualified-link (expand-file-name
+                                          (cond ((string= (substring project-link 0 1)
+                                                          ".")
+                                                 project-link)
+                                                ((string= (substring project-link 0 1)
+                                                          "/")
+                                                 (concat root-dir (substring project-link 1)))
+                                                (t
+                                                 (concat root-dir project-link))))))
                     (setq related-files (cons (related-files--build-cons name project-link qualified-link)
                                               related-files)
                           start-char (match-end 0))
