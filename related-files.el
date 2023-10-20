@@ -36,6 +36,11 @@
 
 ;;; Code:
 
+(require 'subr-x)
+(declare-function string-remove-prefix "subr-x.el" (prefix string))
+
+(defvar related-files-map (make-hash-table :test 'equal))
+
 (defun related-files--line-end-respecting-backslash ()
   "Return the line-end-positon of nearest non-backslash terminated line."
   (let ((le 1))
@@ -50,14 +55,16 @@
       (setq le (1+ le)))
     le))
 
-(defun related-files--build-cons (name relative-link qualified-link)
-  "Build the assoc cons cell for the file NAME RELATIVE-LINK QUALIFIED-LINK."
-  (cons (propertize name 'display (concat name " ~> " relative-link))
-        qualified-link))
+(defvar related-files-link-string " -> ")
 
-(require 'subr-x)
-(declare-function string-remove-prefix "subr-x.el" (prefix string))
-(defvar related-files-map (make-hash-table :test 'equal))
+(defun related-files--build-cons (name relative-link qualified-link &optional display-name)
+  "Build the assoc cons cell for the file NAME RELATIVE-LINK QUALIFIED-LINK.
+DISPLAY-NAME can be used to overwrite the NAME for display purposes."
+  (cons (propertize name 'display (concat (or display-name
+                                              name)
+                                          related-files-link-string
+                                          relative-link))
+        qualified-link))
 
 ;;;###autoload
 (defun related-files-list (&optional buffer-name)
@@ -108,7 +115,7 @@
                           start-char (match-end 0))
                     (puthash qualified-file-link
                              (delete-dups
-                              (cons (related-files--build-cons "related-to" base-buffer-project-file-link base-buffer-qualified-file-link)
+                              (cons (related-files--build-cons base-buffer base-buffer-project-file-link base-buffer-qualified-file-link "related-to")
                                     (gethash qualified-file-link
                                              project-related-files
                                              (list))))
