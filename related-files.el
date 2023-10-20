@@ -50,6 +50,10 @@
       (setq le (1+ le)))
     le))
 
+(require 'subr-x)
+(declare-function string-remove-prefix "subr-x.el" (prefix string))
+(defvar related-files-map (make-hash-table :test 'equal))
+
 ;;;###autoload
 (defun related-files-list (&optional buffer-name)
   "Return an alist of (name . path) annotations for BUFFER-NAME, or current buffer."
@@ -61,7 +65,17 @@
                                (fboundp 'project-root))
                           (project-root (project-current)))
                          ((fboundp 'vc-root-dir) (vc-root-dir))))
-         (related-files (list)))
+         (base-buffer-qualified-file-link (expand-file-name base-buffer))
+         (base-buffer-project-file-link (string-remove-prefix root-dir
+                                                              base-buffer-qualified-file-link))
+         ;; Get hash of related files from project
+         (project-related-files (gethash root-dir
+                                         related-files-map
+                                         (make-hash-table :test 'equal)))
+         ;; Get existing list of related files for this buffer
+         (related-files (gethash base-buffer-qualified-file-link
+                                 project-related-files
+                                 (list))))
     (with-current-buffer base-buffer
       (save-excursion
         (save-restriction
@@ -87,9 +101,24 @@
                     (setq related-files (cons (cons (propertize name 'display (concat name " -> " file-link))
                                                     qualified-file-link)
                                               related-files)
-                          start-char (match-end 0)))))
+                          start-char (match-end 0))
+                    (puthash qualified-file-link
+                             (delete-dups
+                              (cons (cons (propertize name 'display (concat "related-to -> " base-buffer-project-file-link))
+                                          base-buffer-qualified-file-link)
+                                    (gethash qualified-file-link
+                                             project-related-files
+                                             (list))))
+                             project-related-files))))
               (forward-line le))))))
-    (reverse related-files)))
+    (puthash base-buffer-qualified-file-link
+             (delete-dups related-files)
+             project-related-files)
+    (puthash root-dir
+             project-related-files
+             related-files-map)
+    (gethash base-buffer-qualified-file-link
+             project-related-files)))
 
 ;;;###autoload
 (defun related-files-find-related-file (&optional buffer-name)

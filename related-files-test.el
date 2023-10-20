@@ -17,7 +17,7 @@
 ;;   [two](/.gitignore)
 
 
-
+;; TODO: fix string-prefix for test runs
 (ert-deftest related-files-test ()
   (with-temp-buffer
     (insert-file-contents "./related-files-test.el")
