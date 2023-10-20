@@ -21,7 +21,7 @@
 ;; The following are all valid annotations.
 ;;
 ;; A very simple annotation:
-;; @related [test](/src/related.test.js)
+;; @related [test](/related-files-test.el)
 ;;
 ;; Annotation lines can contain several related files
 ;; See @related [test](/src/related.test.js), [test](/src/other.test.js), and [css](/assets/style.css)
@@ -60,10 +60,10 @@
 (defun related-files--build-cons (name relative-link qualified-link &optional display-name)
   "Build the assoc cons cell for the file NAME RELATIVE-LINK QUALIFIED-LINK.
 DISPLAY-NAME can be used to overwrite the NAME for display purposes."
-  (cons (propertize name 'display (concat (or display-name
-                                              name)
-                                          related-files-link-string
-                                          relative-link))
+  (cons (concat (or display-name
+                    name)
+                related-files-link-string
+                relative-link)
         qualified-link))
 
 ;;;###autoload
