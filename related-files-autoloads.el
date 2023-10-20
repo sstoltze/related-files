@@ -20,7 +20,7 @@ Prompt to visit related files defined in BUFFER-NAME.
 Defaults to current buffer.
 
 (fn &optional BUFFER-NAME)" t)
-(register-definition-prefixes "related-files" '("related-files--line-end-respecting-backslash"))
+(register-definition-prefixes "related-files" '("related-files-"))
 
 
 ;;; End of scraped data

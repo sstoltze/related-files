@@ -50,6 +50,11 @@
       (setq le (1+ le)))
     le))
 
+(defun related-files--build-cons (name relative-link qualified-link)
+  "Build the assoc cons cell for the file NAME RELATIVE-LINK QUALIFIED-LINK."
+  (cons (propertize name 'display (concat name " ~> " relative-link))
+        qualified-link))
+
 (require 'subr-x)
 (declare-function string-remove-prefix "subr-x.el" (prefix string))
 (defvar related-files-map (make-hash-table :test 'equal))
@@ -98,14 +103,12 @@
                                                      (concat root-dir (substring file-link 1)))
                                                     (t
                                                      (concat root-dir file-link)))))
-                    (setq related-files (cons (cons (propertize name 'display (concat name " -> " file-link))
-                                                    qualified-file-link)
+                    (setq related-files (cons (related-files--build-cons name file-link qualified-file-link)
                                               related-files)
                           start-char (match-end 0))
                     (puthash qualified-file-link
                              (delete-dups
-                              (cons (cons (propertize name 'display (concat "related-to -> " base-buffer-project-file-link))
-                                          base-buffer-qualified-file-link)
+                              (cons (related-files--build-cons "related-to" base-buffer-project-file-link base-buffer-qualified-file-link)
                                     (gethash qualified-file-link
                                              project-related-files
                                              (list))))
