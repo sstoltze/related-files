@@ -37,9 +37,15 @@
 ;;; Code:
 
 (require 'subr-x)
+(require 'project)
 (declare-function string-remove-prefix "subr-x.el" (prefix string))
 
-(defvar related-files-map (make-hash-table :test 'equal))
+(defgroup related-files nil
+  "Related file annotation support for Emacs."
+  :group 'convenience
+  :link '(url-link "https://github.com/sstoltze/related-files"))
+
+(defvar related-files--project-map (make-hash-table :test 'equal))
 
 (defun related-files--line-end-respecting-backslash ()
   "Return the line-end-positon of nearest non-backslash terminated line."
@@ -55,13 +61,14 @@
       (setq le (1+ le)))
     le))
 
-(defvar related-files-link-string " -> ")
+(defcustom related-files-link-string
+  " -> "
+  "The value to display between name and link in related file overview."
+  :type 'string)
 
-(defun related-files--build-cons (name relative-link qualified-link &optional display-name)
-  "Build the assoc cons cell for the file NAME RELATIVE-LINK QUALIFIED-LINK.
-DISPLAY-NAME can be used to overwrite the NAME for display purposes."
-  (cons (concat (or display-name
-                    name)
+(defun related-files--build-cons (name relative-link qualified-link)
+  "Build the assoc cons cell for the file NAME RELATIVE-LINK QUALIFIED-LINK."
+  (cons (concat name
                 related-files-link-string
                 relative-link)
         qualified-link))
@@ -73,19 +80,17 @@ DISPLAY-NAME can be used to overwrite the NAME for display purposes."
   (let* ((base-buffer (or buffer-name
                           (buffer-base-buffer)
                           (buffer-name)))
-         (root-dir (cond ((and (fboundp 'project-current)
-                               (fboundp 'project-root))
-                          (project-root (project-current)))
-                         ((fboundp 'vc-root-dir) (vc-root-dir))))
-         (base-buffer-qualified-file-link (expand-file-name base-buffer))
-         (base-buffer-project-file-link (string-remove-prefix root-dir
-                                                              base-buffer-qualified-file-link))
+         (root-dir (or (project-root (project-current))
+                       (and (fboundp 'vc-root-dir) (vc-root-dir))))
+         (base-buffer-qualified-link (expand-file-name base-buffer))
+         (base-buffer-project-link (string-remove-prefix root-dir
+                                                         base-buffer-qualified-link))
          ;; Get hash of related files from project
          (project-related-files (gethash root-dir
-                                         related-files-map
+                                         related-files--project-map
                                          (make-hash-table :test 'equal)))
          ;; Get existing list of related files for this buffer
-         (related-files (gethash base-buffer-qualified-file-link
+         (related-files (gethash base-buffer-qualified-link
                                  project-related-files
                                  (list))))
     (with-current-buffer base-buffer
@@ -101,33 +106,33 @@ DISPLAY-NAME can be used to overwrite the NAME for display purposes."
               (when (string-match-p "@related" line)
                 (while (string-match "\\[\\(.*?\\)\\](\\(.*?\\))" line start-char)
                   (let* ((name      (match-string 1 line))
-                         (file-link (match-string 2 line))
-                         (qualified-file-link (cond ((string= (substring file-link 0 1)
-                                                              ".")
-                                                     (concat (expand-file-name file-link)))
-                                                    ((string= (substring file-link 0 1)
-                                                              "/")
-                                                     (concat root-dir (substring file-link 1)))
-                                                    (t
-                                                     (concat root-dir file-link)))))
-                    (setq related-files (cons (related-files--build-cons name file-link qualified-file-link)
+                         (project-link (match-string 2 line))
+                         (qualified-link (cond ((string= (substring project-link 0 1)
+                                                         ".")
+                                                (concat (expand-file-name project-link)))
+                                               ((string= (substring project-link 0 1)
+                                                         "/")
+                                                (concat root-dir (substring project-link 1)))
+                                               (t
+                                                (concat root-dir project-link)))))
+                    (setq related-files (cons (related-files--build-cons name project-link qualified-link)
                                               related-files)
                           start-char (match-end 0))
-                    (puthash qualified-file-link
+                    (puthash qualified-link
                              (delete-dups
-                              (cons (related-files--build-cons base-buffer base-buffer-project-file-link base-buffer-qualified-file-link "related-to")
-                                    (gethash qualified-file-link
+                              (cons (related-files--build-cons "related-to" base-buffer-project-link base-buffer-qualified-link)
+                                    (gethash qualified-link
                                              project-related-files
                                              (list))))
                              project-related-files))))
               (forward-line le))))))
-    (puthash base-buffer-qualified-file-link
+    (puthash base-buffer-qualified-link
              (delete-dups related-files)
              project-related-files)
     (puthash root-dir
              project-related-files
-             related-files-map)
-    (gethash base-buffer-qualified-file-link
+             related-files--project-map)
+    (gethash base-buffer-qualified-link
              project-related-files)))
 
 ;;;###autoload
