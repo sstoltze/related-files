@@ -148,6 +148,5 @@ Defaults to current buffer."
       (let ((file-name (cdr (assoc-string chosen-file related-files))))
         (find-file file-name)))))
 
-
 (provide 'related-files)
 ;;; related-files.el ends here
