@@ -3,6 +3,7 @@
 ;;; Code:
 (require 'ert)
 (require 'related-files)
+(require 'project)
 
 ;; A very simple annotation:
 ;; @related [tested-file](./related-files.el)
@@ -17,22 +18,32 @@
 ;;   [two](/.gitignore)
 
 
-;; TODO: fix string-prefix for test runs
 (ert-deftest related-files-test ()
   (with-temp-buffer
     (insert-file-contents "./related-files-test.el")
-    (let* ((related-files (related-files-list)))
+    (let* ((related-files (sort (related-files-list)
+                                #'(lambda (a b) (string< (car a)
+                                                         (car b))))))
       (should (= (length related-files)
                  6))
       (should (equal (car related-files)
-                     (cons "tested-file" (expand-file-name "./related-files.el"))))
-      ;; TODO: fix project-root not being set for tests run from Makefile
+                     (cons "Makefile -> ./Makefile" (expand-file-name "./Makefile"))))
       (should (equal (cadr related-files)
-                     (cons "non-relative-file"
-                           (concat (if (fboundp 'project-root)
-                                       (project-root (project-current))
-                                     "")
-                                   "related-files.el")))))))
+                     (cons "non-relative-file -> /related-files.el"
+                           (expand-file-name "./related-files.el"))))
+      ;; Check that we insert a related-to entry in the other files
+      (should (member (expand-file-name "./related-files.el")
+                      (hash-table-keys (gethash (expand-file-name (project-root (project-current)))
+                                                related-files--project-map))))
+      (should (assoc "related-to"
+                     (gethash (expand-file-name "./related-files.el")
+                              (gethash (expand-file-name (project-root (project-current)))
+                                       related-files--project-map))
+                     ;; We have to switch the element order for string-prefix-p in the test-fn
+                     (lambda (alist-elem s)
+                       (string-prefix-p s alist-elem)))))))
+
+
 
 (provide 'related-files-test)
 ;;; related-files-test.el ends here
