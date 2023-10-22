@@ -4,7 +4,7 @@
 ;; Version: 1.0
 ;; Keywords: convenience, files, hypermedia
 ;; URL: https://github.com/sstoltze/related-files
-;; Package-Requires: ((emacs "24.4"))
+;; Package-Requires: ((emacs "28.1"))
 
 
 ;;; Commentary:
