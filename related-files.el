@@ -4,7 +4,7 @@
 ;; Version: 1.0
 ;; Keywords: convenience, files, hypermedia
 ;; URL: https://github.com/sstoltze/related-files
-;; Package-Requires: ((emacs "28.1"))
+;; Package-Requires: ((emacs "24.4"))
 
 
 ;;; Commentary:
@@ -37,7 +37,6 @@
 ;;; Code:
 
 (require 'subr-x)
-(require 'project)
 (declare-function string-remove-prefix "subr-x.el" (prefix string))
 
 (defgroup related-files nil
@@ -61,6 +60,16 @@
       (setq le (1+ le)))
     le))
 
+(defun related-files--project-root ()
+  "Get the root of the project, depending on what libraries are available."
+  (expand-file-name
+   (cond ((and (fboundp 'project-root) (fboundp 'project-current))
+          (project-root (project-current)))
+         ((fboundp 'vc-root-dir)
+          (vc-root-dir))
+         (t
+          "/"))))
+
 (defcustom related-files-link-string
   " -> "
   "The value to display between name and link in related file overview."
@@ -80,9 +89,7 @@
   (let* ((base-buffer (or buffer-name
                           (buffer-base-buffer)
                           (buffer-name)))
-         (root-dir (expand-file-name
-                    (or (project-root (project-current))
-                        (and (fboundp 'vc-root-dir) (vc-root-dir)))))
+         (root-dir (related-files--project-root))
          (base-buffer-qualified-link (expand-file-name base-buffer))
          (base-buffer-project-link (string-remove-prefix root-dir
                                                          base-buffer-qualified-link))
@@ -106,7 +113,7 @@
                    (start-char 0))
               (when (string-match-p "@related" line)
                 (while (string-match "\\[\\(.*?\\)\\](\\(.*?\\))" line start-char)
-                  (let* ((name      (match-string 1 line))
+                  (let* ((name         (match-string 1 line))
                          (project-link (match-string 2 line))
                          (qualified-link (expand-file-name
                                           (cond ((string= (substring project-link 0 1)

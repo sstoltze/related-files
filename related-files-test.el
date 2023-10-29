@@ -3,7 +3,6 @@
 ;;; Code:
 (require 'ert)
 (require 'related-files)
-(require 'project)
 
 ;; A very simple annotation:
 ;; @related [tested-file](./related-files.el)
@@ -33,17 +32,15 @@
                            (expand-file-name "./related-files.el"))))
       ;; Check that we insert a related-to entry in the other files
       (should (member (expand-file-name "./related-files.el")
-                      (hash-table-keys (gethash (expand-file-name (project-root (project-current)))
+                      (hash-table-keys (gethash (related-files--project-root)
                                                 related-files--project-map))))
       (should (assoc "related-to"
                      (gethash (expand-file-name "./related-files.el")
-                              (gethash (expand-file-name (project-root (project-current)))
+                              (gethash (related-files--project-root)
                                        related-files--project-map))
                      ;; We have to switch the element order for string-prefix-p in the test-fn
                      (lambda (alist-elem s)
                        (string-prefix-p s alist-elem)))))))
-
-
 
 (provide 'related-files-test)
 ;;; related-files-test.el ends here
