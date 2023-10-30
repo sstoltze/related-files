@@ -63,12 +63,9 @@
 (defun related-files--project-root ()
   "Get the root of the project, depending on what libraries are available."
   (expand-file-name
-   (cond ((and (fboundp 'project-root) (fboundp 'project-current))
-          (project-root (project-current)))
-         ((fboundp 'vc-root-dir)
-          (vc-root-dir))
-         (t
-          "~/"))))
+   (or (and (fboundp 'project-root) (fboundp 'project-current) (project-root (project-current)))
+       (and (fboundp 'vc-root-dir) (vc-root-dir))
+       "~/")))
 
 (defcustom related-files-link-string
   " -> "
