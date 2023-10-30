@@ -29,7 +29,7 @@
                      (cons "Makefile -> ./Makefile" (expand-file-name "./Makefile"))))
       (should (equal (cadr related-files)
                      (cons "non-relative-file -> /related-files.el"
-                           (expand-file-name "./related-files.el"))))
+                           (concat (related-files--project-root) "related-files.el"))))
       ;; Check that we insert a related-to entry in the other files
       (should (member (expand-file-name "./related-files.el")
                       (hash-table-keys (gethash (related-files--project-root)
