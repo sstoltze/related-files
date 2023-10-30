@@ -68,7 +68,7 @@
          ((fboundp 'vc-root-dir)
           (vc-root-dir))
          (t
-          "~"))))
+          "~/"))))
 
 (defcustom related-files-link-string
   " -> "
