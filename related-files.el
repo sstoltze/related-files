@@ -152,5 +152,18 @@ Defaults to current buffer."
       (let ((file-name (cdr (assoc-string chosen-file related-files))))
         (find-file file-name)))))
 
+;;;###autoload
+(defun related-files-projects ()
+  "Return the list of projects in the project map."
+  (hash-table-keys related-files--project-map))
+
+;;;###autoload
+(defun related-files-find-project ()
+  "Prompt to visit the projects that related-file knows about."
+  (interactive)
+  (let* ((chosen-project (completing-read "Related files: " (related-files-projects) nil nil)))
+    (when chosen-project
+      (find-file chosen-project))))
+
 (provide 'related-files)
 ;;; related-files.el ends here
