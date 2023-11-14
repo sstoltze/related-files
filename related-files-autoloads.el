@@ -20,6 +20,10 @@ Prompt to visit related files defined in BUFFER-NAME.
 Defaults to current buffer.
 
 (fn &optional BUFFER-NAME)" t)
+(autoload 'related-files-projects "related-files" "\
+Return the list of projects in the project map.")
+(autoload 'related-files-find-project "related-files" "\
+Prompt to visit the projects that related-file knows about." t)
 (register-definition-prefixes "related-files" '("related-files-"))
 
 
