@@ -1,0 +1,36 @@
+#+AUTHOR: Sarah Stoltze
+#+EMAIL: sstoltze@gmail.com
+#+DATE: 2023-11-19
+#+OPTIONS: toc:nil title:nil author:nil email:nil date:nil creator:nil
+
+
+
+* related-files
+This package provides support for working with related file annotations.
+The annotations are described in more detail at https://github.com/synchronal/related-files.
+
+The package currently supports scanning for annotations in the current file, and navigating between them.
+It also stores the annotations on a project level, so if =related-files.el= is marked as related to =related-files-test.el=, then an automatic relation is stored for the link the other way.
+
+** Annotations
+An annotation starts with @related, followed by one or more Markdown-style links consisting
+of an arbitrary name (e.g., "test", "css", "header") and a path to the file:
+@related [name](path)
+The path is either relative to the current file (if it starts with a "."),
+or to the project root otherwise.
+The annotation ends with a newline character.
+
+*** Examples
+The following are all valid annotations.
+
+A very simple annotation:
+@related [test](/related-files-test.el)
+
+Annotation lines can contain several related files
+See @related [test](/src/related.test.js), [test](/src/other.test.js), and [css](/assets/style.css)
+
+And can span multiple lines
+@related \
+  [test](/test/core/foo_test.exs) \
+  [test](/test/integration/bar_test.exs) \
+  [sass](/assets/css/foo.sass)
