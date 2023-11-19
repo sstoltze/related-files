@@ -13,7 +13,7 @@ The package currently supports scanning for annotations in the current file, and
 It also stores the annotations on a project level, so if =related-files.el= is marked as related to =related-files-test.el=, then an automatic relation is stored for the link the other way.
 
 ** Annotations
-An annotation starts with @related, followed by one or more Markdown-style links consisting
+An annotation starts with =@related=, followed by one or more Markdown-style links consisting
 of an arbitrary name (e.g., "test", "css", "header") and a path to the file:
 #+begin_src
   @related [name](path)
@@ -26,22 +26,23 @@ The annotation ends with a newline character.
 *** Examples
 The following are all valid annotations.
 
-A very simple annotation:
-#+begin_src
-  @related [test](/related-files-test.el)
+A very simple annotation, marking that the file is related to tests:
+#+begin_src elisp
+;; @related [test](/related-files-test.el)
 #+end_src
 
 
 Annotation lines can contain several related files:
-#+begin_src
-  See @related [test](/src/related.test.js), [test](/src/other.test.js), and [css](/assets/style.css)
+#+begin_src js
+  // See @related [test](/src/related.test.js), [test](/src/other.test.js), and [css](/assets/style.css)
 #+end_src
+This generates three relations, to the three mentioned files.
 
 
 And can span multiple lines using backslashes:
-#+begin_src
-  @related \
-  [test](/test/core/foo_test.exs) \
-  [test](/test/integration/bar_test.exs) \
-  [sass](/assets/css/foo.sass)
+#+begin_src elixir
+# @related \
+# [test](/test/core/foo_test.exs) \
+# [test](/test/integration/bar_test.exs) \
+# [sass](/assets/css/foo.sass)
 #+end_src
