@@ -15,7 +15,10 @@ It also stores the annotations on a project level, so if =related-files.el= is m
 ** Annotations
 An annotation starts with @related, followed by one or more Markdown-style links consisting
 of an arbitrary name (e.g., "test", "css", "header") and a path to the file:
-@related [name](path)
+#+begin_src
+  @related [name](path)
+#+end_src
+
 The path is either relative to the current file (if it starts with a "."),
 or to the project root otherwise.
 The annotation ends with a newline character.
@@ -24,13 +27,21 @@ The annotation ends with a newline character.
 The following are all valid annotations.
 
 A very simple annotation:
-@related [test](/related-files-test.el)
+#+begin_src
+  @related [test](/related-files-test.el)
+#+end_src
 
-Annotation lines can contain several related files
-See @related [test](/src/related.test.js), [test](/src/other.test.js), and [css](/assets/style.css)
 
-And can span multiple lines
-@related \
+Annotation lines can contain several related files:
+#+begin_src
+  See @related [test](/src/related.test.js), [test](/src/other.test.js), and [css](/assets/style.css)
+#+end_src
+
+
+And can span multiple lines using backslashes:
+#+begin_src
+  @related \
   [test](/test/core/foo_test.exs) \
   [test](/test/integration/bar_test.exs) \
   [sass](/assets/css/foo.sass)
+#+end_src
