@@ -63,7 +63,8 @@
 (defun related-files--project-root ()
   "Get the root of the project, depending on what libraries are available."
   (expand-file-name
-   (or (and (fboundp 'project-root) (fboundp 'project-current) (project-root (project-current)))
+   (or (and (fboundp 'projectile-project-root) (projectile-project-root))
+       (and (fboundp 'project-root) (fboundp 'project-current) (project-root (project-current)))
        (and (fboundp 'vc-root-dir) (vc-root-dir))
        "~/")))
 
