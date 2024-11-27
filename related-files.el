@@ -63,7 +63,7 @@
 (defun related-files--project-root ()
   "Get the root of the project, depending on what libraries are available."
   (expand-file-name
-   (or (and (fboundp 'lsp-workspace-root) (lsp-workspace-root))
+   (or (and (fboundp 'lsp-workspace-root) (format "%s/" (lsp-workspace-root)))
        (and (fboundp 'projectile-project-root) (projectile-project-root))
        (and (fboundp 'project-root) (fboundp 'project-current) (project-root (project-current)))
        (and (fboundp 'vc-root-dir) (vc-root-dir))
